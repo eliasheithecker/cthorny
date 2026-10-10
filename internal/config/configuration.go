@@ -5,8 +5,8 @@ import (
 	"net"
 	"os"
 
-	"github.com/juriroemer/thorny/filter"
-	"github.com/juriroemer/thorny/handler"
+	"github.com/juriroemer/thorny/internal/filter"
+	"github.com/juriroemer/thorny/internal/handler"
 	"go.yaml.in/yaml/v4"
 )
 

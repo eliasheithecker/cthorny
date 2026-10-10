@@ -1,0 +1,46 @@
+logging:
+  logDir: './data/logs'
+tls:
+  organization: 'Some Org'
+  country: 'Germany'
+  province: ' NRW'
+  locality: 'NRW'
+  streetAddress: 'Somestreet'
+  postalCode: '48143'
+  commonName: 'Some Name'
+  dnsNames:
+    - 'nsec.uni-muenster.de'
+  daysValid: 31
+  certPath: './data/tls/cert.pem'
+  keyPath: './data/tls/key.pem'
+
+## A Map of Handlers. Uses the port a the handler should use as key.
+handlers:
+  25:
+    name: smtp_handler
+    config:
+  22:
+    name: ssh_handler
+    config:
+      values:
+        version: 'OpenSSH_8.9p1'
+        message_limit: 10
+        id_ed25519: './data/ssh/id_ed25519'
+        id_rsa: './data/ssh/id_rsa'
+        id_ecdsa: './data/ssh/id_ecdsa'
+  389:
+    name: ldap_handler
+    config:
+      values:
+        fakeSearchresultEntry: 'uid=admin,dc=example,dc=com' # TODO
+  23:
+    name: telnet_handler
+    config:
+      values:
+        message_limit: 10
+
+## Different Filters. Probably to be cut.
+filters:
+  - name: ipfilter
+    config:
+      ips:

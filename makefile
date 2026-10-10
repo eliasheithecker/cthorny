@@ -1,12 +1,16 @@
 .DEFAULT_GOAL := run
 
 run:
-	go run .
+	(cd ./cmd/ && go run .)
+
+run-dev:
+	(cd ./cmd/ && go run . --config=dev-config.yaml)
 
 build:
-	go build .
+	(cd ./cmd/ && go build .)
 
 br:
+	cd ./cmd/
 	go build .
 	./thorny $(ARGS)
 
