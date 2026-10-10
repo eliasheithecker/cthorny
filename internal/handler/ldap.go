@@ -18,7 +18,7 @@ import (
 
 	ber "github.com/go-asn1-ber/asn1-ber"
 	ldap "github.com/go-ldap/ldap/v3"
-	"github.com/juriroemer/thorny/lib"
+	"github.com/juriroemer/thorny/internal/lib"
 )
 
 // StartTLS error type

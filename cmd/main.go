@@ -12,10 +12,10 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/juriroemer/thorny/config"
-	"github.com/juriroemer/thorny/filter"
-	"github.com/juriroemer/thorny/handler"
-	"github.com/juriroemer/thorny/lib"
+	"github.com/juriroemer/thorny/internal/config"
+	"github.com/juriroemer/thorny/internal/filter"
+	"github.com/juriroemer/thorny/internal/handler"
+	"github.com/juriroemer/thorny/internal/lib"
 )
 
 func main() {

@@ -18,7 +18,7 @@ import (
 
 	"go.yaml.in/yaml/v4"
 
-	"github.com/juriroemer/thorny/lib"
+	"github.com/juriroemer/thorny/internal/lib"
 )
 
 // SMTP config struct
