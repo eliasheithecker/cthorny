@@ -1,0 +1,37 @@
+[project]
+name = "analyser"
+version = "0.1.0"
+description = "Nächtliche Auswertung der Thorny-Sensordaten"
+requires-python = ">=3.11,<3.13" # 3.12.16 für Notebook
+dependencies = [
+    "pyspark>=4.0",
+    "pandas<3",
+]
+# "pandas<3" pyspark pyarrow ipykernel fürs Notebook funktioniert
+
+
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+packages = [
+    "models",
+    "utils",
+    "workflows",
+    "workflows.aggregate",
+    "workflows.daily",
+    "workflows.daily.s1_collect",
+    "workflows.daily.s2_pre_process",
+    "workflows.daily.s3_identify",
+    "workflows.daily.s4_analyse",
+    "workflows.daily.s5_convert",
+    "workflows.daily.s6_upload",
+    "workflows.daily.s7_post_process",
+]
+py-modules = ["main"]
+
+[tool.setuptools.package-data]
+"utils" = ["multiple.ini"]
+"workflows.daily.s3_identify" = ["scanners.csv"]
