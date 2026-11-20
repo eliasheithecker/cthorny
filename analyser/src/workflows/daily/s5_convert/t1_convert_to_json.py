@@ -2,8 +2,7 @@ import csv
 import datetime as dt
 import json
 import logging
-from dataclasses import fields, is_dataclass
-from enum import Enum
+from dataclasses import fields
 from pathlib import Path
 from typing import Any
 
@@ -23,7 +22,7 @@ from models import (
     TransportLevel,
 )
 from models.paths import WorkingFiles
-from utils import Context, GROUP_KEY, UNKNOWN_ID, group_order
+from utils import Context, GROUP_KEY, UNKNOWN_ID, group_order, write_json
 
 log = logging.getLogger(__name__)
 
@@ -43,8 +42,6 @@ def convert_to_json(ctx: Context) -> None:
     if not ctx.force_reload and output_file.exists():
         log.info("Daily result already exists, skipping step")
         return
-    output_file.parent.mkdir(parents=True, exist_ok=True)
-
     result = DailyResult(
         schema_version=SCHEMA_VERSION,
         date=ctx.date_of_data,
@@ -53,8 +50,7 @@ def convert_to_json(ctx: Context) -> None:
         actors=[parse_actor(row) for row in load_actor_rows(ctx)],
     )
 
-    with output_file.open("w", encoding="utf-8") as f:
-        json.dump(to_jsonable(result), f, ensure_ascii=False, indent=2)
+    write_json(result, output_file)
     log.info(
         "Daily result with %d sensors and %d actors saved to %s",
         len(result.sensors), len(result.actors), output_file,
@@ -165,19 +161,3 @@ def parse_protocols(row: dict[str, Any]) -> dict[Protocol, ProtocolResult]:
 def _number(value: str) -> int | float:
     number = float(value)
     return int(number) if number.is_integer() else number
-
-
-def to_jsonable(obj: Any) -> Any:
-    """Dataclasses rekursiv in JSON-Typen umwandeln; Enums als Wert, Daten als ISO 8601."""
-    if is_dataclass(obj):
-        return {f.name: to_jsonable(getattr(obj, f.name)) for f in fields(obj)}
-    if isinstance(obj, Enum):
-        value = obj.value
-        return int(value) if isinstance(value, float) and value.is_integer() else value
-    if isinstance(obj, dict):
-        return {to_jsonable(k): to_jsonable(v) for k, v in obj.items()}
-    if isinstance(obj, list):
-        return [to_jsonable(v) for v in obj]
-    if isinstance(obj, (dt.date, dt.datetime)):
-        return obj.isoformat()
-    return obj

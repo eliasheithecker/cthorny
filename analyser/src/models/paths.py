@@ -36,4 +36,7 @@ class WorkingFiles(StrEnum):
     SCANNER_IPS = "interim/scanners/scanner_ips.tsv"
     SCANNER_GROUPS_TRAFFIC = "interim/scanners/scanner_groups_traffic.tsv"
     DAILY_RESULT_JSON = "results/daily_result.json"
+    # aggregate-Workflow
+    AGGREGATE_S3_RESULTS_DIR = "aggregate/s3_results"  # Spiegel von results/ im Bucket
+    AGGREGATED_RESULT_JSON = "results/aggregated.json"
 

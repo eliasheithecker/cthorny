@@ -9,6 +9,11 @@ UNKNOWN_ID = "unknown"
 GROUP_KEY = ["id_source", "id"]
 
 
+def group_sort_key(id_source: str, id: str) -> tuple[int, str]:
+    """Python-Gegenstück zu group_order(): editorial -> isc -> unknown, dann nach id."""
+    return {"editorial": 0, "isc": 1}.get(id_source, 2), id
+
+
 def group_order() -> Column:
     """Sortierung der Gruppen: editorial -> isc -> unknown."""
     return (

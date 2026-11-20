@@ -1,4 +1,6 @@
 from .aggregated import (
+    MAX_WINDOW_DAYS,
+    WINDOW_DAYS,
     AggregatedResult,
     Coverage,
     Window,

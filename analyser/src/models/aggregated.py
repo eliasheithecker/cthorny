@@ -15,6 +15,10 @@ from .common import ActorId, ProtocolResult
 from .daily import DailyTraffic
 from .levels import Protocol
 
+# Länge der festen Fenster in Tagen, jeweils einschließlich as_of (Felder von Windows außer all)
+WINDOW_DAYS = {"last_7d": 7, "last_31d": 31, "last_365d": 365}
+MAX_WINDOW_DAYS = max(WINDOW_DAYS.values())
+
 
 @dataclass
 class Coverage:
