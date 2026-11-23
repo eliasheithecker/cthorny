@@ -1,0 +1,46 @@
+# Builds a thorny release when a tag "thorny-v*" is pushed, e.g.:
+#   git tag thorny-v0.1.0 && git push origin thorny-v0.1.0
+# The release holds the static linux binaries and the sensor config that
+# thorny/deploy/startup.sh downloads (THORNY_VERSION = the tag).
+# Tags with a suffix (thorny-v0.1.0-rc.1) become pre-releases.
+name: thorny release
+
+on:
+  push:
+    tags: ["thorny-v*"]
+
+permissions:
+  contents: write   # create the release and upload assets
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: thorny
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: thorny/go.mod
+          cache-dependency-path: thorny/go.sum
+
+      - name: Test
+        run: go test ./...
+
+      - name: Build
+        run: make release
+
+      - name: Check deploy scripts
+        run: bash -n deploy/*.sh deploy/services/*.sh
+
+      - name: Publish release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          flags=()
+          [[ "$TAG" =~ ^thorny-v[0-9]+\.[0-9]+\.[0-9]+$ ]] || flags+=(--prerelease)
+          gh release create "$TAG" dist/thorny-linux-amd64 dist/thorny-linux-arm64 dist/aws-config.yaml \
+            --title "$TAG" --generate-notes "${flags[@]}"

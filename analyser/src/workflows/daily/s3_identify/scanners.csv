@@ -1,0 +1,54 @@
+id;name;type;url;suffix
+dtu;DTU;Academic;http://130.226.254.28/;dtuscanner.compute.dtu.dk
+fhmuenster;FH Muenster;Academic;https://fb02itsscan02.fh-muenster.de/;fh-muenster.de
+gatech;Georgia Tech;Academic;https://researchscan241.cc.gatech.edu/;gatech.edu
+haw;HAW Hamburg;Academic;https://research-scan1.inet.haw-hamburg.de/;inet.haw-hamburg.de
+ums;ITRP (UMS/Twente);Academic;https://please-see-measurements.internet-transparency.org;please-see-measurements.internet-transparency.org
+mpg;Max Planck Institute for Informatics;Academic;https://inet-research-scan-6.mpi-inf.mpg.de;mpg.de
+bochum;Ruhruni Bochum;Academic;https://ports-measurements.softsec.ruhr-uni-bochum.de;ports-measurements.softsec.ruhr-uni-bochum.de
+tum;TU Muenchen;Academic;https://one88.cm.in.tum.de;in.tum.de
+ucsd;UCSD;Academic;https://research-scan.sysnet.ucsd.edu;research-scan.sysnet.ucsd.edu
+onlyscans;OnlyScans;Anonymous;https://www.onlyscans.com/;
+project25499;Project25499;Anonymous;https://blogproject25499.wordpress.com/;
+recyber;Recyber Project;Anonymous;https://www.recyber.net/;
+academyforinternetresarch;Academy for Internet Research;Anonymous;https://academyforinternetresearch.org;academyforinternetresearch.org
+binaryedge;binaryedge.ninja;Anonymous;;binaryedge.ninja
+internetresearchproject;Internet Research Project;Anonymous;;internet-research-project.net
+internettl;internettl.org;Anonymous;https://web.archive.org/web/20210921015530/http://www.internettl.org/;internettl.org
+pocnroll;pocnroll.com;Anonymous;https://research.pocnroll.com/;pocnroll.com
+cnmsb;research-scan.cnmsb.cfd;Anonymous;;research-scan.cnmsb.cfd
+researchscanner;research-scanner.com;Anonymous;;research-scanner.com
+securityresearchnet;securityresearch.net;Anonymous;;form.securityresearch.net
+stretchoid;Stretchoid;Anonymous;https://stretchoid.com/;stretchoid.com
+arbor;Arbor Networks;Commercial;;
+censys;Censys, Inc;Commercial;https://docs.censys.com/docs/opt-out-of-data-collection;censys-scanner.com
+criminalip;CriminalIP;Commercial;;security.criminalip.com
+cyberok;Cyber OK;Commercial;https://www.cyberok.ru/docs/Abuse%20policy_eng.pdf;cyberok.ru
+cybercube;CyberCube;Commercial;;scanning.cybcube.com
+cypex;Cypex;Commercial;https://cypex.ai/scanning/;scan.cypex.ai
+domaintools;Domaintools;Commercial;;pub-netscan.adm.domaintools.net
+expanse;Expanse (Palo Alto Networks);Commercial;;
+f6security;F6 Security;Commercial;;scan.f6.security
+hadrian;Hadrian.io;Commercial;https://hadrian.io/research;hadrian.io
+ipip;IPIP.NET;Commercial;;ipip.net
+intrinsec;Intrinsec;Commercial;;intrinsec.com
+kaspersky;Kaspersky Labs;Commercial;;kaspersky-labs.com
+leakix;Leak IX;Commercial;http://b69efeaf93.scan.leakix.org;leakix.org
+modat;Modat B.V.;Commercial;https://magnify.modat.io/opt-out;modat.io
+nokia;Nokia Deepfield;Commercial;;deepfield.net
+odin;Odin (Cyble Inc.);Commercial;;
+qrator;Qrator Labs;Commercial;;
+rapid7;Rapid 7;Commercial;https://www.rapid7.com/research/project-sonar/;rapid7.com
+seranking;SE Ranking;Commercial;;seranking.com
+semrush;Semrush;Commercial;;
+shodan;Shodan;Commercial;;shodan.io
+sudosecuritygroup;Sudo Security Group;Commercial;;sudosecuritygroup.com
+visionheight;Visionheight;Commercial;;scan.visionheight.com
+bufferoverrun;bufferover.run;Commercial;https://newtls.bufferover.run/;bufferover.run
+cyberresilience;Cyberresilience.io (UpGuard Inc);Commercial;https://cyberresilience.io/cyberresilience;cyberresilience.io
+internetcensus;internet-census.com (Bitsight Inc);Commercial;https://www.internet-census.org/;internet-census.org
+internetmeasurement;internet-measurement.com (Driftnet Ltd);Commercial;https://internet-measurement.com/;internet-measurement.com
+onyphe;Onyphe;Commercial;https://rodriquez.probe.onyphe.net/;onyphe.net
+shadowforce;Shadowforce (Barfin Bay/Mastercard);Commercial;https://shadowforce.io/;shadowforce.io
+cubedb;CubeDB;Hobbyist;https://cubedb.io/abuse;census.cubedb.io
+shadowserver;Shadowserver Foundation;NGO;https://www.shadowserver.org/faq/can-i-opt-out-of-your-scanning-activity/;

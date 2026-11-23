@@ -1,1 +1,1 @@
-# thorny
+# cthorny (continuously thorny)

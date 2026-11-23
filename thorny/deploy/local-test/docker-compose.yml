@@ -1,0 +1,53 @@
+# Local test of the deploy scripts. See README.md in this directory.
+name: cthorny-local-test
+
+services:
+  s3mock:
+    image: adobe/s3mock:5.2.3
+    environment:
+      COM_ADOBE_TESTING_S3MOCK_STORE_INITIAL_BUCKETS: cthorny-test
+    ports:
+      - "9090:9090"
+    networks:
+      # fixed IP: startup.sh replaces /etc/resolv.conf, the name s3mock is not resolvable afterwards
+      net: { ipv4_address: 169.254.169.10 }
+
+  imds-mock:   # fake EC2 metadata service at the same address as on AWS
+    image: python:3.12-alpine
+    command: python -m http.server 80 --directory /srv
+    volumes:
+      - ./imds:/srv:ro
+    networks:
+      net: { ipv4_address: 169.254.169.254 }
+
+  sensor:   # Ubuntu 22.04 with systemd (Dockerfile); amd64 so gotrace runs too
+    build: .
+    platform: linux/amd64
+    privileged: true   # needed for systemd
+    tmpfs: [/run, /run/lock]
+    post_start:   # what cloud-init does on AWS; waits for systemd to finish booting first
+      - command: >-
+          bash -c "systemctl is-system-running --wait;
+          bash /deploy/startup.sh cthorny-test http://169.254.169.10:9090 testkey testsecret testpw aws eu-central-1a
+          > /var/log/startup.log 2>&1"
+    environment:   # read by startup.sh
+      BASE_URL: file:///deploy
+      THORNY_RELEASE_URL: file:///dist
+      ROTATE_MINUTES: "2"
+    volumes:
+      - ..:/deploy:ro
+      - ../../dist:/dist:ro
+    ports:   # thorny
+      - "2222:22"
+      - "2323:23"
+      - "2525:25"
+      - "3389:389"
+    networks: [net]
+
+networks:
+  net:
+    enable_ipv6: true   # the webhook listens on IPv6 only
+    ipam:
+      config:
+        - subnet: 169.254.169.0/24
+        - subnet: fd00:c7::/64

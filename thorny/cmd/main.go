@@ -1,0 +1,116 @@
+package main
+
+import (
+	"context"
+	"flag"
+	"fmt"
+	"log/slog"
+	"net"
+	"os"
+	"os/signal"
+	"sync"
+	"syscall"
+	"time"
+
+	"github.com/juriroemer/thorny/internal/config"
+	"github.com/juriroemer/thorny/internal/filter"
+	"github.com/juriroemer/thorny/internal/handler"
+	"github.com/juriroemer/thorny/internal/lib"
+)
+
+func main() {
+	configFile := flag.String("config", "config.yaml", "the path of the config file")
+	flag.Parse()
+
+	config, err := config.NewConfig(configFile)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	// LOGGING
+	// Logs go to <logDir>/thorny-<unix>.jsonl, a new file per interval
+	// (config.Logging.RotateMinutes, aligned to full intervals in UTC).
+	logDir := config.Logging.LogDir
+	if logDir == "" {
+		logDir = "."
+	}
+	logWriter, err := lib.NewRotatingWriter(logDir, "thorny-", time.Duration(config.Logging.RotateMinutes)*time.Minute)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "failed to set up log writer: %v\n", err)
+		os.Exit(1)
+	}
+	defer logWriter.Close()
+	jsonHandler := slog.NewJSONHandler(logWriter, &slog.HandlerOptions{
+		ReplaceAttr: func(groups []string, a slog.Attr) slog.Attr {
+			switch a.Key {
+			case slog.LevelKey, slog.MessageKey, slog.TimeKey: // drop Level, MSG and slog timestamp
+				return slog.Attr{}
+			}
+			return a
+		},
+	})
+	// Determine sensor IP to include in all logs
+	sensorIP := "unknown"
+	if config.Network.PrimaryIP != nil {
+		sensorIP = config.Network.PrimaryIP.String()
+	}
+	sensorLogger := slog.New(jsonHandler).With("sensor_ip", sensorIP)
+
+	// TODO create certs for ssh and tls, add to context
+	os.MkdirAll("cert", os.ModePerm)
+	tlsUserConf, err := lib.NewTlsUserConfig(config.Tls, config.Network.Ips)
+	if err := lib.GenerateSelfSignedCert(tlsUserConf); err != nil {
+		panic(err)
+	}
+
+	/* go func() {
+		// TODO use context for things like config
+		err := log_snort(config.Snort.Rules)
+		if err != nil {
+			slog.Warn(err.Error())
+		}
+	}() */
+
+	fr := filter.NewFilterRegistry()
+	fr.Init()
+
+	for _, f := range config.Filters {
+		fr.Activate(f)
+	}
+
+	// Register, activate and serve configured protocol handlers
+	hr := handler.NewHandlerRegistry()
+	hr.Init()
+
+	for port, h := range config.Handlers {
+		listener, err := net.Listen("tcp", fmt.Sprintf(":%d", port))
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "failed to listen on port %d: %v\n", port, err)
+			os.Exit(1)
+		}
+		portLogger := sensorLogger.With(
+			slog.Int("sensor_port", port),
+		)
+		hr.Activate(port, h, listener, portLogger)
+	}
+
+	ctx, cancel := context.WithCancel(context.Background())
+	// attach the fully parsed TLS user config into the context for handlers
+	ctx = context.WithValue(ctx, lib.CtxTlsUserConfig, tlsUserConf)
+
+	var wg = &sync.WaitGroup{}
+	hr.ServeAll(ctx, wg)
+
+	termChan := make(chan os.Signal, 1)
+	signal.Notify(termChan, syscall.SIGINT, syscall.SIGTERM)
+
+	<-termChan // Blocks here until interrupted
+
+	// Handle shutdown
+	fmt.Println("*********************************\nShutdown signal received\n*********************************")
+	cancel()  // Signal cancellation to context.Context
+	wg.Wait() // Block here until are workers are done
+
+	fmt.Println("All handlers done, shutting down!")
+}
