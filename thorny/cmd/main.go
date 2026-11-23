@@ -29,20 +29,19 @@ func main() {
 	}
 
 	// LOGGING
-	// Use sensor IP in filename when available and include timestamp
-	ts := time.Now().Format("2006-01-02T150405")
-	// allow configuration of the logging directory via config.Logging.LogDir
+	// Logs go to <logDir>/thorny-<unix>.jsonl, a new file per interval
+	// (config.Logging.RotateMinutes, aligned to full intervals in UTC).
 	logDir := config.Logging.LogDir
 	if logDir == "" {
 		logDir = "."
 	}
-	_ = os.MkdirAll(logDir, 0777)
-	logPath := fmt.Sprintf("%s/log-%s.jsonl", logDir, ts)
-	if config.Network.PrimaryIP != nil {
-		logPath = fmt.Sprintf("%s/log-%s-%s.jsonl", logDir, config.Network.PrimaryIP.String(), ts)
+	logWriter, err := lib.NewRotatingWriter(logDir, "thorny-", time.Duration(config.Logging.RotateMinutes)*time.Minute)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "failed to set up log writer: %v\n", err)
+		os.Exit(1)
 	}
-	logFile, _ := os.OpenFile(logPath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
-	jsonHandler := slog.NewJSONHandler(logFile, &slog.HandlerOptions{
+	defer logWriter.Close()
+	jsonHandler := slog.NewJSONHandler(logWriter, &slog.HandlerOptions{
 		ReplaceAttr: func(groups []string, a slog.Attr) slog.Attr {
 			switch a.Key {
 			case slog.LevelKey, slog.MessageKey, slog.TimeKey: // drop Level, MSG and slog timestamp

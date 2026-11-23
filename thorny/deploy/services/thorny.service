@@ -1,0 +1,16 @@
+[Unit]
+Description=thorny honeypot (cthorny sensor)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/root/config/thorny
+ExecStart=/usr/local/bin/thorny --config=/etc/thorny/config.yaml
+Restart=always
+RestartSec=5
+KillSignal=SIGTERM
+TimeoutStopSec=15
+
+[Install]
+WantedBy=multi-user.target

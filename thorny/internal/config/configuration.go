@@ -15,8 +15,11 @@ type Config struct {
 	C2 net.IP `yaml:"c2"`
 
 	Network struct {
-		Ips         []net.IP
-		PrimaryIP   net.IP
+		Ips []net.IP
+		// PrimaryIP can be set in the config (e.g. the public IP of a cloud VM,
+		// which is NATed and not visible on the interface). If unset, it is
+		// inferred from the default interface.
+		PrimaryIP   net.IP `yaml:"primaryIp"`
 		Iface       string `yaml:"iface"`
 		Promiscuous bool   `yaml:"promiscuous"`
 	}
@@ -25,6 +28,8 @@ type Config struct {
 		Snaplen           int    `yaml:"snaplen"`
 		Packetsperlogfile int    `yaml:"packetsperlogfile"`
 		LogDir            string `yaml:"logDir"`
+		// RotateMinutes: a new log file is started at every full interval (UTC). Default 10.
+		RotateMinutes int `yaml:"rotateMinutes"`
 	}
 
 	Snort struct {
@@ -64,10 +69,21 @@ func NewConfig(configPath *string) (*Config, error) {
 			ips := ExtractIPs(addrs)
 			filtered := FilterSensorIPs(ips)
 			config.Network.Ips = filtered
-			config.Network.PrimaryIP = ChoosePrimaryIP(filtered)
 		}
 	} else {
 		slog.Warn("no default network interface inferred; Network.Ips will be empty")
+	}
+
+	// A configured PrimaryIP wins over the inferred one. It is also added to
+	// Network.Ips, since that list ends up in the TLS certificate.
+	if config.Network.PrimaryIP == nil {
+		config.Network.PrimaryIP = ChoosePrimaryIP(config.Network.Ips)
+	} else if !containsIP(config.Network.Ips, config.Network.PrimaryIP) {
+		config.Network.Ips = append([]net.IP{config.Network.PrimaryIP}, config.Network.Ips...)
+	}
+
+	if config.Logging.RotateMinutes <= 0 {
+		config.Logging.RotateMinutes = 10
 	}
 
 	// config defaults; the new yaml fork yaml/go-yaml does not seem to have default values yet :(
@@ -76,4 +92,13 @@ func NewConfig(configPath *string) (*Config, error) {
 	}
 
 	return config, nil
+}
+
+func containsIP(ips []net.IP, ip net.IP) bool {
+	for _, i := range ips {
+		if i.Equal(ip) {
+			return true
+		}
+	}
+	return false
 }
